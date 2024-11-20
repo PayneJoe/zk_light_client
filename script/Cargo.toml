@@ -1,0 +1,26 @@
+[package]
+name = "script"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "plonk_test"
+path = "src/plonk_test.rs"
+
+[dependencies]
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+tracing = "0.1.40"
+hex = "0.4.3"
+alloy-sol-types = { workspace = true }
+zk-light-client-lib = { path = "../lib" }
+sp1-sdk = { workspace = true }
+clap = { workspace = true }
+bitcoin = { workspace = true }
+zk-light-client-core = { path = "../core" }
+hex-literal = { workspace = true } 
+crypto-bigint = { workspace = true } 
+
+
+[build-dependencies]
+sp1-helper = { workspace = true } 
