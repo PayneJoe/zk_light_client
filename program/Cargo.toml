@@ -1,0 +1,9 @@
+[package]
+name = "program"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+alloy-sol-types = { workspace = true }
+sp1-zkvm = { workspace = true }
+zk-light-client-core = { path = "../core" }
