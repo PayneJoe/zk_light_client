@@ -1,7 +1,8 @@
 use crate::sha256_merkle::get_merkle_root;
+use crate::constants::EXPECTED_EPOCH_SECONDS;
 
-// use crypto_bigint::CheckedAdd;
 use crypto_bigint::U256;
+use crypto_bigint::CheckedMul;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
@@ -89,7 +90,6 @@ pub fn verify_block(
 ) {
     // [1] verify proposed target is equal to real target
     let proposed_target = bits_to_target(proposed_block.bits);
-
     assert_eq!(
         retarget_block.bits, proposed_block.bits,
         "Proposed target does not match real target"
@@ -111,6 +111,39 @@ pub fn verify_block(
 
     // [4] verify PoW (double sha256(block_hash) <= target)
     assert_pow(&proposed_block_hash, proposed_block, proposed_target);
+}
+
+pub fn assert_target_bits(
+    last_epoch_begin_block: &Block,
+    last_epoch_end_block: &Block,
+    new_epoch_begin_block: &Block,
+) {
+    let old_target_difficulty = bits_to_target(
+        last_epoch_begin_block.bits
+    );
+    let new_target_difficulty = old_target_difficulty
+        .checked_mul(&U256::from_u32(
+            u32::from_le_bytes(last_epoch_end_block.time) - u32::from_le_bytes(last_epoch_begin_block.time),
+        ))
+        .unwrap()
+        .checked_div(&U256::from_u32(EXPECTED_EPOCH_SECONDS))
+        .unwrap();
+
+    let new_bits = u32::from_le_bytes(
+        new_epoch_begin_block.bits
+    );
+    let (mant, expt) = (new_bits >> 24, new_bits & 0xFFFFFF);
+    if mant <= 3 {
+        assert_eq!(
+            new_target_difficulty,
+            U256::from_u32(expt) >> (8 * (3 - mant) as usize)
+        );
+    } else {
+        assert_eq!(
+            new_target_difficulty >> (8 * (mant - 3) as usize),
+            U256::from_u32(expt)
+        );
+    }
 }
 
 pub fn assert_blockchain(
@@ -137,11 +170,13 @@ pub fn assert_blockchain(
         let next_block_hash = next_block.compute_block_hash();
         block_hashes.push(current_block_hash);
 
-        // Change retarget block if necessary
+        // check target bits
         if next_block.height % 2016 == 0 {
+            assert_target_bits(&last_retarget_block, current_block, next_block);
             last_retarget_block = *next_block;
         }
 
+        // check block header
         verify_block(
             next_block_hash,
             current_block_hash,

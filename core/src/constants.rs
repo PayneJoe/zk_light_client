@@ -1,1 +1,4 @@
-pub const MAX_BLOCKS: usize = 3000;
+pub const MAX_BLOCKS: usize = 500;
+pub const EPOCH_BLOCK_NUMBER: u32 = 2016;
+pub const BLOCK_TIMEVAL: u32 = 600;
+pub const EXPECTED_EPOCH_SECONDS: u32 = EPOCH_BLOCK_NUMBER * BLOCK_TIMEVAL;

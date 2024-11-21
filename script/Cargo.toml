@@ -2,10 +2,15 @@
 name = "script"
 version = "0.1.0"
 edition = "2021"
+default-run = "groth16_test"
 
 [[bin]]
 name = "plonk_test"
 path = "src/plonk_test.rs"
+
+[[bin]]
+name = "groth16_test"
+path = "src/groth16_test.rs" 
 
 [dependencies]
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
