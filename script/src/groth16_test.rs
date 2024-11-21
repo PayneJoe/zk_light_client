@@ -11,12 +11,12 @@ use sp1_sdk::{ProverClient, SP1Stdin};
 
 fn get_test_case_circuit_input() -> CircuitInput {
     let num_blocks = 500;
-    let mined_blocks = (854373..(854373 + num_blocks)).map(|height| deserialize::<Block>(&load_hex_bytes(format!("../tests/data/block_{height}.hex").as_str())).unwrap()).collect::<Vec<_>>();
+    let mined_blocks = (854373..(854373 + num_blocks)).map(|height| deserialize::<Block>(&load_hex_bytes(format!("/root/blocks/data/block_{height}.hex").as_str())).unwrap()).collect::<Vec<_>>();
 
     let mined_block_height = 854374;
     let retarget_block_height = get_retarget_height_from_block_height(mined_block_height);
     let mined_retarget_block = deserialize::<Block>(&load_hex_bytes(
-        format!("../tests/data/block_{retarget_block_height}.hex").as_str(),
+        format!("/root/blocks/data/block_{retarget_block_height}.hex").as_str(),
     ))
     .unwrap();
 
